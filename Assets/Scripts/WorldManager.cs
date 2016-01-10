@@ -18,6 +18,8 @@ public class WorldManager : MonoBehaviour {
 	public GameObject stonePrefav;
 	public GameObject plantPrefav;
 
+	public GameObject enemyPrefav;
+
 	private Element[][] world;
 
 	void Start() {
@@ -39,6 +41,8 @@ public class WorldManager : MonoBehaviour {
 							elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
 						} else if (rand < 0.7) {
 							elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
+						} else if (rand < 0.8) {
+							elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
 						}
 					}
 				}
@@ -74,34 +78,49 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element PickUpObjectInFront(Transform trans) {
-		Element elem = PickUpElementAtWorldPos(PositionInFront(trans));
+		Element elem = PickUpElementAtWorldPos(PositionInFrontWorldPos(trans));
 
 		return elem != null && elem.CanPickUp() ? elem : null;
 	}
 
-	public Vector3 PositionInFront(Transform trans) {
+	public Vector3 PositionInFrontWorldPos(Transform trans) {
 		return trans.position + (trans.forward * blockW);
 	}
 
+	public Vector2 PositionInFrontGridPos(Transform trans) {
+		Vector3 pos = PositionInFrontWorldPos(trans);
+		int x = Mathf.RoundToInt(pos.x / blockW);
+		int y = Mathf.RoundToInt(pos.z / blockW);
+		return new Vector2(x, y);
+	}
+
 	public Vector3 PositionInFrontPlayer() {
-		return PositionInFront(player);
+		return PositionInFrontWorldPos(player);
+	}
+
+	public Element PickUpElementAtGridPos(int i, int j) {
+		Element elem = world[i][j];
+		world[i][j] = null;
+
+		return elem;
 	}
 
 	public Element PickUpElementAtWorldPos(Vector3 pos) {
 		int x = Mathf.RoundToInt(pos.x / blockW);
 		int y = Mathf.RoundToInt(pos.z / blockW);
 
-		Element elem = world[x][y];
-		world[x][y] = null;
+		return PickUpElementAtGridPos(x, y);
+	}
 
-		return elem;
+	public Element GetElementAtGridPos(int i, int j) {
+		return world[i][j];
 	}
 
 	public Element GetElementAtWorldPos(Vector3 pos) {
 		int x = Mathf.RoundToInt(pos.x / blockW);
 		int y = Mathf.RoundToInt(pos.z / blockW);
 
-		return world[x][y];
+		return GetElementAtGridPos(x, y);
 	}
 
 	public bool MoveElementAtWorldPos(Element elem, Vector3 pos) {
@@ -194,9 +213,12 @@ public class WorldManager : MonoBehaviour {
 			Destroy(world[i][j].gameObject);
 		world[i][j] = elem;
 		elem.PutDown(i, j);
-		elem.transform.position = new Vector3(i * blockW, 0, j * blockW);
+		elem.transform.position = GridToWorldPos(i, j);
 	}
 
+	public Vector3 GridToWorldPos(int i, int j) {
+		return new Vector3(i * blockW, 0, j * blockW);
+	}
 
 	public Vector3 SnapToGrid(Vector3 pos) {
 		int x = Mathf.RoundToInt(pos.x / blockW);
@@ -230,12 +252,12 @@ public class WorldManager : MonoBehaviour {
 						elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
 						break;
 					}
-					return true;
-				}
 
-				if (elem != null) {
-					elem.transform.parent = transform;
-					SetElementAtGridPos(elem, i, j);
+					if (elem != null) {
+						elem.transform.parent = transform;
+						SetElementAtGridPos(elem, i, j);
+					}
+					return true;
 				}
 			}
 		}

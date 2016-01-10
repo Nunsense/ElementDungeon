@@ -6,8 +6,8 @@ public enum ElementType {
 	Water,
 	Stone,
 	Plant,
-	None
-
+	None,
+	Enemy
 }
 
 public class Element : MonoBehaviour {
@@ -23,12 +23,12 @@ public class Element : MonoBehaviour {
 
 	void Awake() {
 		world = GameObject.Find("World").GetComponent<WorldManager>();
-		transform.eulerAngles = new Vector3(0, rotations[Random.Range(0, rotations.Length)], 0);
+		RotateRandom();
 	}
 
 	void Update() {
 		if (CanPickUp() && pickUpOrigin != null) {
-			transform.position = world.PositionInFrontPlayer();
+			transform.position = world.PositionInFrontWorldPos(pickUpOrigin.transform);
 		}
 
 		UpdateElement();
@@ -36,7 +36,6 @@ public class Element : MonoBehaviour {
 
 	public void PickUp(GameObject obj) {
 		pickUpOrigin = obj.transform;
-		Debug.Log(pickUpOrigin);
 	}
 
 	public void PutDown(int i, int j) {
@@ -51,6 +50,10 @@ public class Element : MonoBehaviour {
 
 	public int GetGridY() {
 		return gridY;
+	}
+
+	protected void RotateRandom() {
+		transform.eulerAngles = new Vector3(0, rotations[Random.Range(0, rotations.Length)], 0);
 	}
 
 	protected virtual void UpdateElement() {
