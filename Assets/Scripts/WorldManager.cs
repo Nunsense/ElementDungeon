@@ -17,6 +17,7 @@ public class WorldManager : MonoBehaviour {
 	public GameObject waterPrefav;
 	public GameObject stonePrefav;
 	public GameObject plantPrefav;
+	public GameObject soulPrefav;
 
 	public GameObject enemyPrefav;
 
@@ -208,11 +209,52 @@ public class WorldManager : MonoBehaviour {
 					return false;
 				}
 				break;
+			case ElementType.Enemy:
+				switch (elem.GetElement()) {
+				case ElementType.Fire:
+					Destroy(other.gameObject);
+					Destroy(elem.gameObject);
+					Element soul = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+					soul.transform.parent = transform;
+					SetElementAtGridPos(soul, i, j);
+					return true;
+				case ElementType.Water:
+					Destroy(elem.gameObject);
+					return true;
+				case ElementType.Stone:
+					Destroy(other.gameObject);
+					return true;
+				}
+				return false;
+			case ElementType.Soul:
+				switch (elem.GetElement()) {
+				case ElementType.Stone:
+					CreateSquareOfElement(ElementType.Stone, i, j, 5);
+					break;
+				}
+				Destroy(elem.gameObject);
+				return true;
 			}
 		}
 
 		SetElementAtGridPos(elem, i, j);
 		return true;
+	}
+
+	private void CreateSquareOfElement(ElementType type, int i, int j, int r) {
+		for (int ii = -r; ii <= r; ii++) {
+			for (int jj = -r; jj <= r; jj++) {
+				if (ii != -r && ii != r && jj != -r && jj != r)
+					continue;
+
+				int jjj = j + jj;
+				int iii = i + ii;
+
+				if (InMap(iii, jjj) && GetElementAtGridPos(iii, jjj) == null) {
+					CreateElementAtGridPos(type, iii, jjj);
+				}
+			}	
+		}
 	}
 
 	public void SetElementAtWorldPos(Element elem, Vector3 pos) {

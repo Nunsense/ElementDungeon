@@ -7,7 +7,8 @@ public enum ElementType {
 	Stone,
 	Plant,
 	None,
-	Enemy
+	Enemy,
+	Soul
 }
 
 public class Element : MonoBehaviour {
