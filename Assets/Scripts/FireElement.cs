@@ -17,7 +17,7 @@ public class FireElement : Element {
 					continue;
 
 				Element elem = near[ii][jj];
-
+				Debug.Log(elem);
 				if (elem != null && elem.GetElement() == ElementType.Plant) {
 					world.CreateElementAtGridPos(ElementType.Fire, elem.GetGridX(), elem.GetGridY());
 				}

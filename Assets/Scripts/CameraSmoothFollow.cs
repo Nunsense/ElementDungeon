@@ -2,7 +2,8 @@
 
 public class CameraSmoothFollow : MonoBehaviour {
 	public Transform target;
-	public float factor = 1;
+	public float followFactor = 1;
+	public float rotationFactor = 0.2f;
 	private Vector3 posOffset;
 
 	void Awake () {
@@ -14,10 +15,10 @@ public class CameraSmoothFollow : MonoBehaviour {
 	}
 
 	void Update () {
-		transform.position = Vector3.Lerp (transform.position, target.position - posOffset, Time.deltaTime * factor);
+		transform.position = Vector3.Lerp (transform.position, target.position - posOffset, Time.deltaTime * followFactor);
 		Quaternion rotTo = Quaternion.LookRotation (target.position - transform.position);
 		rotTo.y = 0;
 		rotTo.z = 0;
-		transform.rotation = Quaternion.Lerp (transform.rotation, rotTo, Time.deltaTime * factor);
+		transform.rotation = Quaternion.Lerp (transform.rotation, rotTo, Time.deltaTime * rotationFactor);
 	}
 }

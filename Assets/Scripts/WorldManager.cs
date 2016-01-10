@@ -62,6 +62,19 @@ public class WorldManager : MonoBehaviour {
 		}	
 
 		placementCube.position = SnapToGrid(PositionInFrontPlayer());
+
+//		Vector2 pos = WorldToGridPos(player.position);
+//		float minX = pos.x - 15, maxX = pos.x + 15;
+//		float minY = pos.y - 15, maxY = pos.y + 15;
+//		Element elem;
+//		for (int i = 0; i < worldW; i++) {
+//			for (int j = 0; j < worldH; j++) {
+//				elem = world[i][j];
+//				if (elem != null) {
+//					elem.SetVisible(i >= minX && i <= maxX && j >= minY && j <= maxY);
+//				}
+//			}
+//		}
 	}
 
 	void Tick() {
@@ -220,6 +233,13 @@ public class WorldManager : MonoBehaviour {
 		return new Vector3(i * blockW, 0, j * blockW);
 	}
 
+	public Vector2 WorldToGridPos(Vector3 pos) {
+		int x = Mathf.RoundToInt(pos.x / blockW);
+		int y = Mathf.RoundToInt(pos.z / blockW);
+
+		return new Vector2(x, y);
+	}
+
 	public Vector3 SnapToGrid(Vector3 pos) {
 		int x = Mathf.RoundToInt(pos.x / blockW);
 		int y = Mathf.RoundToInt(pos.z / blockW);
@@ -228,11 +248,11 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public bool CreateElementArround(ElementType type, int ii, int jj) {
-		for (int i = ii - 1; i < ii + 1; i++) {
+		for (int i = ii - 1; i <= ii + 1; i++) {
 			if (!iInMap(i))
 				continue;
 
-			for (int j = jj - 1; j < jj + 1; j++) {
+			for (int j = jj - 1; j <= jj + 1; j++) {
 				if (!jInMap(j))
 					continue;
 
@@ -314,10 +334,10 @@ public class WorldManager : MonoBehaviour {
 	public Element [][] GetElementsNearBy(int ii, int jj, int r) {
 		int iii = 0, jjj = 0;
 		Element[][] nearBys = new Element[(r * 2) + 1] [];
-		for (int i = ii - r; i < ii + r; i++) {
+		for (int i = ii - r; i <= ii + r; i++) {
 			nearBys[iii] = new Element[(r * 2) + 1];
 			if (iInMap(i)) {
-				for (int j = jj - r; j < jj + r; j++) {
+				for (int j = jj - r; j <= jj + r; j++) {
 					if (jInMap(j)) {
 						nearBys[iii][jjj] = world[i][j];
 					}

@@ -59,7 +59,7 @@ public class Enemy : Element {
 						walkingTargetGridX = (int)inFront.x;
 						walkingTargetGridY = (int)inFront.y;
 						walkingTargetPos = world.GridToWorldPos(walkingTargetGridX, walkingTargetGridY);
-					} else if (elem.GetElement() != ElementType.None || elem.GetElement() != ElementType.Enemy) {
+					} else if (elem.GetElement() == ElementType.Plant || elem.GetElement() == ElementType.Stone) {
 						world.PickUpElementAtGridPos((int)inFront.x, (int)inFront.y);
 						elem.PickUp(gameObject);
 					} else {

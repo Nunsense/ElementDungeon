@@ -11,18 +11,21 @@ public enum ElementType {
 }
 
 public class Element : MonoBehaviour {
-	private int gridX;
-	private int gridY;
+	protected int gridX;
+	protected int gridY;
 
 	private ElementType type;
 	private Transform pickUpOrigin;
 
 	protected WorldManager world;
 
+	protected Renderer ren;
+
 	static int[] rotations = new int[] { 0, 90, 180, 270 };
 
 	void Awake() {
 		world = GameObject.Find("World").GetComponent<WorldManager>();
+		ren = GetComponentInChildren<Renderer>();
 		RotateRandom();
 	}
 
@@ -32,6 +35,10 @@ public class Element : MonoBehaviour {
 		}
 
 		UpdateElement();
+	}
+
+	public void SetVisible(bool visible) {
+		ren.enabled = visible;
 	}
 
 	public void PickUp(GameObject obj) {
