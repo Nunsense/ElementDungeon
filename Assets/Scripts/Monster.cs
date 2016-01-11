@@ -19,6 +19,8 @@ public class Monster : Element {
 	private Element pickedUpObject;
 
 	public float blockDistanceWalkTime = 0.2f;
+	[SerializeField][Range(0, 1)] private float agroChance; 
+	[SerializeField] private float agroDistance; 
 
 	void Start() {
 		isDead = false;
@@ -29,6 +31,13 @@ public class Monster : Element {
 	public void Kill() {
 		dieingTime = maxDeadTime;
 		isDead = true;
+	}
+
+	void OnTriggerEnter(Collider col) {
+		if (col.tag == "Letal") {
+			world.HitMonster(gameObject);
+			GetComponent<Rigidbody>().AddForce((transform.position - col.transform.position) * 5000f);
+		}
 	}
 
 	protected override void UpdateElement() {
@@ -86,7 +95,23 @@ public class Monster : Element {
 						restingTime = Random.Range(0, maxRestTime);
 					}
 				}
+
+
+				rand = Random.value;
+				if (rand < agroChance) {
+					if (world.DistanceToPlayer(transform.position) < agroDistance) {
+						isWandering = false;
+						Debug.Log("AGROOOOOO");
+					}
+				}
 			}
+		} else {
+			if (world.DistanceToPlayer(transform.position) > 20) {
+				isWandering = true;
+				Debug.Log("I totally forgot why I was running like a 1D fan at a concert");
+			}
+			transform.LookAt(world.PlayerTransform().position);
+			transform.position = Vector3.Lerp(transform.position, world.PlayerTransform().position, Time.deltaTime);
 		}
 	}
 

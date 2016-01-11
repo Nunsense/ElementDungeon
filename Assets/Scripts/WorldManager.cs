@@ -436,6 +436,7 @@ public class WorldManager : MonoBehaviour {
 	public void HitMonster(GameObject go) {
 		mosnterExplosion.transform.position = go.transform.position;
 		mosnterExplosion.Play();
+		go.transform.rotation = Random.rotation;
 		go.GetComponent<Monster>().Kill();
 	}
 
@@ -443,5 +444,13 @@ public class WorldManager : MonoBehaviour {
 		Vector2 pos = WorldToGridPos(go.transform.position);
 		Destroy(go);
 		CreateElementAtGridPos(ElementType.Soul, (int)pos.x, (int)pos.y);
+	}
+
+	public float DistanceToPlayer(Vector3 position) {
+		return Vector3.Distance(player.position, position);
+	}
+
+	public Transform PlayerTransform() {
+		return player.transform;
 	}
 }
