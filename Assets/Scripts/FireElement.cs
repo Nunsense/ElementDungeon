@@ -2,8 +2,10 @@
 using System.Collections;
 
 public class FireElement : Element {
+	public GameObject particles;
+	public GameObject lights;
+
 	void Start() {
-	
 	}
 
 	public override void Action(int i, int j) {
@@ -17,7 +19,6 @@ public class FireElement : Element {
 					continue;
 
 				Element elem = near[ii][jj];
-				Debug.Log(elem);
 				if (elem != null && elem.GetElement() == ElementType.Plant) {
 					world.CreateElementAtGridPos(ElementType.Fire, elem.GetGridX(), elem.GetGridY());
 				}
@@ -31,5 +32,10 @@ public class FireElement : Element {
 
 	public override bool CanPickUp() {
 		return true;
+	}
+
+	public override void SetVisible(bool visible) {
+		lights.SetActive(visible);
+		particles.SetActive(visible);
 	}
 }

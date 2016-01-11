@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class SoulElement : Element {
+	public GameObject particles;
+	public GameObject lights;
 
 	void Start () {
 	
@@ -13,5 +15,10 @@ public class SoulElement : Element {
 
 	public override bool CanPickUp () {
 		return true;
+	}
+
+	public override void SetVisible(bool visible) {
+		lights.SetActive(visible);
+		particles.SetActive(visible);
 	}
 }

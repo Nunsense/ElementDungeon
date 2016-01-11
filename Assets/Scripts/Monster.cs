@@ -13,6 +13,9 @@ public class Monster : Element {
 	private float maxRestTime = 5f;
 	private float restingTime;
 
+	private float maxDeadTime = 2f;
+	private float dieingTime;
+
 	private Element pickedUpObject;
 
 	public float blockDistanceWalkTime = 0.2f;
@@ -24,12 +27,19 @@ public class Monster : Element {
 	}
 
 	public void Kill() {
+		dieingTime = maxDeadTime;
 		isDead = true;
 	}
 
 	protected override void UpdateElement() {
-		if (isDead)
+		if (isDead) {
+			dieingTime -= Time.deltaTime;
+			if (dieingTime <= 0) {
+				world.KillMonster(gameObject);
+			}
+
 			return;
+		}
 
 		if (restingTime > 0) {
 			restingTime -= Time.deltaTime;

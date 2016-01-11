@@ -2,8 +2,9 @@
 using System.Collections;
 
 public class WaterElement : Element {
+	public GameObject particles;
 
-	void Start () {
+	void Start() {
 	
 	}
 
@@ -28,11 +29,15 @@ public class WaterElement : Element {
 		}
 	}
 
-	public override ElementType GetElement () {
+	public override ElementType GetElement() {
 		return ElementType.Water;
 	}
 
-	public override bool CanPickUp () {
+	public override bool CanPickUp() {
 		return true;
+	}
+
+	public override void SetVisible(bool visible) {
+		particles.SetActive(visible);
 	}
 }

@@ -38,10 +38,6 @@ public class Element : MonoBehaviour {
 		UpdateElement();
 	}
 
-	public void SetVisible(bool visible) {
-		ren.enabled = visible;
-	}
-
 	public void PickUp(GameObject obj) {
 		pickUpOrigin = obj.transform;
 	}
@@ -76,5 +72,8 @@ public class Element : MonoBehaviour {
 
 	public virtual bool CanPickUp() {
 		return false;
+	}
+
+	public virtual void SetVisible(bool visible) {
 	}
 }

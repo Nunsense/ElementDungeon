@@ -70,18 +70,19 @@ public class WorldManager : MonoBehaviour {
 
 		placementCube.position = SnapToGrid(PositionInFrontPlayer());
 
-//		Vector2 pos = WorldToGridPos(player.position);
-//		float minX = pos.x - 15, maxX = pos.x + 15;
-//		float minY = pos.y - 15, maxY = pos.y + 15;
-//		Element elem;
-//		for (int i = 0; i < worldW; i++) {
-//			for (int j = 0; j < worldH; j++) {
-//				elem = world[i][j];
-//				if (elem != null) {
-//					elem.SetVisible(i >= minX && i <= maxX && j >= minY && j <= maxY);
-//				}
-//			}
-//		}
+		Vector2 pos = WorldToGridPos(player.position);
+		int side = 15;
+		float minX = pos.x - side, maxX = pos.x + side;
+		float minY = pos.y - side, maxY = pos.y + side;
+		Element elem;
+		for (int i = 0; i < worldW; i++) {
+			for (int j = 0; j < worldH; j++) {
+				elem = world[i][j];
+				if (elem != null) {
+					elem.SetVisible(i >= minX && i <= maxX && j >= minY && j <= maxY);
+				}
+			}
+		}
 	}
 
 	void Tick() {
@@ -218,17 +219,15 @@ public class WorldManager : MonoBehaviour {
 			case ElementType.Enemy:
 				switch (elem.GetElement()) {
 				case ElementType.Fire:
-					Destroy(other.gameObject);
 					Destroy(elem.gameObject);
-					Element soul = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
-					soul.transform.parent = transform;
-					SetElementAtGridPos(soul, i, j);
+					KillMonster(other.gameObject);
 					return true;
 				case ElementType.Water:
 					Destroy(elem.gameObject);
 					return true;
 				case ElementType.Stone:
-					Destroy(other.gameObject);
+					Destroy(elem.gameObject);
+					KillMonster(other.gameObject);
 					return true;
 				}
 				return false;
@@ -268,7 +267,7 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	private void CreateSnowBalls(int i, int j) {
-		for (int m = 0; m < Random.Range(2, 5); m++ ) {
+		for (int m = 0; m < Random.Range(2, 5); m++) {
 			GameObject soul = GameObject.Instantiate(snowBallPrefav);
 			soul.transform.parent = transform;
 
@@ -366,6 +365,9 @@ public class WorldManager : MonoBehaviour {
 		case ElementType.Stone:
 			elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
 			break;
+		case ElementType.Soul:
+			elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+			break;
 		}
 					
 
@@ -431,9 +433,15 @@ public class WorldManager : MonoBehaviour {
 		obj.GetComponent<Rigidbody>().AddForce(origin.forward * 500f);
 	}
 
-	public void KillMonster(GameObject go) {
+	public void HitMonster(GameObject go) {
 		mosnterExplosion.transform.position = go.transform.position;
 		mosnterExplosion.Play();
 		go.GetComponent<Monster>().Kill();
+	}
+
+	public void KillMonster(GameObject go) {
+		Vector2 pos = WorldToGridPos(go.transform.position);
+		Destroy(go);
+		CreateElementAtGridPos(ElementType.Soul, (int)pos.x, (int)pos.y);
 	}
 }

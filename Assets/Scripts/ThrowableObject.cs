@@ -17,7 +17,7 @@ public class ThrowableObject : MonoBehaviour {
 
 	void OnCollisionEnter(Collision col) {
 		if (isLetal && col.collider.tag == "Monster") {
-			world.KillMonster(col.gameObject);
+			world.HitMonster(col.gameObject);
 			col.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
 			Destroy(gameObject);
 		}
