@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Enemy : Element {
+public class Monster : Element {
 	private bool isWandering;
+	private bool isDead;
 
 	private Vector3 walkingTargetPos;
 	private int walkingTargetGridX;
@@ -17,11 +18,19 @@ public class Enemy : Element {
 	public float blockDistanceWalkTime = 0.2f;
 
 	void Start() {
+		isDead = false;
 		isWandering = true;
 		walkingTime = 0;
 	}
 
+	public void Kill() {
+		isDead = true;
+	}
+
 	protected override void UpdateElement() {
+		if (isDead)
+			return;
+
 		if (restingTime > 0) {
 			restingTime -= Time.deltaTime;
 			return;

@@ -19,7 +19,11 @@ public class WorldManager : MonoBehaviour {
 	public GameObject plantPrefav;
 	public GameObject soulPrefav;
 
+	public GameObject snowBallPrefav;
+
 	public GameObject enemyPrefav;
+
+	public ParticleSystem mosnterExplosion;
 
 	private Element[][] world;
 
@@ -44,6 +48,8 @@ public class WorldManager : MonoBehaviour {
 							elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
 						} else if (rand < 0.8) {
 							elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
+						} else {
+							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
 						}
 					}
 				}
@@ -231,7 +237,11 @@ public class WorldManager : MonoBehaviour {
 				case ElementType.Stone:
 					CreateSquareOfElement(ElementType.Stone, i, j, 5);
 					break;
+				case ElementType.Water:
+					CreateSnowBalls(i, j);
+					break;
 				}
+				Destroy(other.gameObject);
 				Destroy(elem.gameObject);
 				return true;
 			}
@@ -254,6 +264,16 @@ public class WorldManager : MonoBehaviour {
 					CreateElementAtGridPos(type, iii, jjj);
 				}
 			}	
+		}
+	}
+
+	private void CreateSnowBalls(int i, int j) {
+		for (int m = 0; m < Random.Range(2, 5); m++ ) {
+			GameObject soul = GameObject.Instantiate(snowBallPrefav);
+			soul.transform.parent = transform;
+
+			Vector3 diff = Vector3.forward * Random.Range(-1f, 1f) + Vector3.right * Random.Range(-1f, 1f) + Vector3.up * Random.Range(0.2f, 2);
+			soul.transform.position = GridToWorldPos(i, j) + diff;
 		}
 	}
 
@@ -402,5 +422,18 @@ public class WorldManager : MonoBehaviour {
 
 	public bool jInMap(int j) {
 		return j >= 0 && j < worldH;
+	}
+
+	public void Throw(ThrowableObject obj, Transform origin) {
+		obj.Throw(this);
+		obj.transform.position = origin.position + origin.forward * 2 + origin.up;
+		obj.gameObject.SetActive(true);
+		obj.GetComponent<Rigidbody>().AddForce(origin.forward * 500f);
+	}
+
+	public void KillMonster(GameObject go) {
+		mosnterExplosion.transform.position = go.transform.position;
+		mosnterExplosion.Play();
+		go.GetComponent<Monster>().Kill();
 	}
 }
