@@ -48,8 +48,8 @@ public class WorldManager : MonoBehaviour {
 							elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
 						} else if (rand < 0.8) {
 							elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
-						} else {
-							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+//						} else {
+//							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
 						}
 					}
 				}
