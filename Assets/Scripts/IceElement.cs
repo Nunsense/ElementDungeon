@@ -9,7 +9,7 @@ public class IceElement : Element {
 	public override void Action(int i, int j) {
 	}
 
-	public override ElementType GetElement() {
+	public override ElementType GetElementType() {
 		return ElementType.Ice;
 	}
 

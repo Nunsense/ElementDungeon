@@ -89,7 +89,7 @@ public class Monster : Element {
 						walkingTargetGridX = (int)inFront.x;
 						walkingTargetGridY = (int)inFront.y;
 						walkingTargetPos = world.GridToWorldPos(walkingTargetGridX, walkingTargetGridY);
-					} else if (elem.GetElement() == ElementType.Plant || elem.GetElement() == ElementType.Stone) {
+					} else if (elem.GetElementType() == ElementType.Plant || elem.GetElementType() == ElementType.Stone) {
 						world.PickUpElementAtGridPos((int)inFront.x, (int)inFront.y);
 						elem.PickUp(gameObject);
 					} else {
@@ -116,7 +116,7 @@ public class Monster : Element {
 		}
 	}
 
-	public override ElementType GetElement() {
+	public override ElementType GetElementType() {
 		return ElementType.Enemy;
 	}
 

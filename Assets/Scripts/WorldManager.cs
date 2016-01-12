@@ -2,9 +2,7 @@
 using System.Collections;
 
 public class WorldManager : MonoBehaviour {
-	[SerializeField] private int worldW;
-	[SerializeField] private int worldH;
-	[SerializeField] private float blockW;
+	public float blockW;
 
 	[SerializeField] private float tickTime = 1f;
 	private float nextTick;
@@ -27,15 +25,15 @@ public class WorldManager : MonoBehaviour {
 
 	public ParticleSystem mosnterExplosion;
 
-	private Element[][] world;
+	public Grid grid;
 
 	void Start() {
-		world = new Element[worldW][];
-		for (int i = 0; i < worldW; i++) {
-			world[i] = new Element[worldH];
-			for (int j = 0; j < worldH; j++) {
+		grid.elements = new Element[grid.w][];
+		for (int i = 0; i < grid.w; i++) {
+			grid.elements[i] = new Element[grid.h];
+			for (int j = 0; j < grid.h; j++) {
 				Element elem = null;
-				if (i == 0 || i == worldW - 1 || j == 0 || j == worldH - 1) {
+				if (i == 0 || i == grid.w - 1 || j == 0 || j == grid.h - 1) {
 					elem = (GameObject.Instantiate(wallPrefav) as GameObject).GetComponent<Element>();
 				} else {
 					if (Random.value < 0.01) {
@@ -80,9 +78,9 @@ public class WorldManager : MonoBehaviour {
 		float minX = pos.x - side, maxX = pos.x + side;
 		float minY = pos.y - side, maxY = pos.y + side;
 		Element elem;
-		for (int i = 0; i < worldW; i++) {
-			for (int j = 0; j < worldH; j++) {
-				elem = world[i][j];
+		for (int i = 0; i < grid.w; i++) {
+			for (int j = 0; j < grid.h; j++) {
+				elem = grid.get(i, j);
 				if (elem != null) {
 					elem.SetVisible(i >= minX && i <= maxX && j >= minY && j <= maxY);
 				}
@@ -93,9 +91,9 @@ public class WorldManager : MonoBehaviour {
 	void Tick() {
 		Element elem;
 
-		for (int i = 0; i < worldW; i++) {
-			for (int j = 0; j < worldH; j++) {
-				elem = world[i][j];
+		for (int i = 0; i < grid.w; i++) {
+			for (int j = 0; j < grid.h; j++) {
+				elem = grid.get(i, j);
 				if (elem != null) {
 					elem.Action(i, j);
 				}
@@ -125,8 +123,8 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element PickUpElementAtGridPos(int i, int j) {
-		Element elem = world[i][j];
-		world[i][j] = null;
+		Element elem = grid.get(i, j);
+		grid.set(i, j, null);
 
 		return elem;
 	}
@@ -139,7 +137,7 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element GetElementAtGridPos(int i, int j) {
-		return world[i][j];
+		return grid.get(i, j);
 	}
 
 	public Element GetElementAtWorldPos(Vector3 pos) {
@@ -156,15 +154,15 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public bool MoveElementAtGridPos(Element newElem, int i, int j) {
-		if (world[i][j] != null) {
-			Element currentElem = world[i][j];
-			switch (currentElem.GetElement()) {
+		if (grid.get(i, j) != null) {
+			Element currentElem = grid.get(i, j);
+			switch (currentElem.GetElementType()) {
 			case ElementType.Fire:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Water:
 					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
-					world[i][j] = null;
+					grid.set(i, j, null);
 					break;
 				case ElementType.Stone:
 					SetElementAtGridPos(newElem, i, j);
@@ -180,11 +178,11 @@ public class WorldManager : MonoBehaviour {
 				}
 				return true;
 			case ElementType.Water:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Fire:
 					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
-					world[i][j] = null;
+					grid.set(i, j, null);
 					break;
 				case ElementType.Water:
 					Destroy(newElem.gameObject);
@@ -198,7 +196,7 @@ public class WorldManager : MonoBehaviour {
 				}
 				return true;
 			case ElementType.Ice:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Fire:
 					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
@@ -219,7 +217,7 @@ public class WorldManager : MonoBehaviour {
 				}
 				return true;
 			case ElementType.Plant:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Water:
 					Destroy(newElem.gameObject);
 					return true;
@@ -234,7 +232,7 @@ public class WorldManager : MonoBehaviour {
 				}
 				break;
 			case ElementType.Stone:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Fire:
 					Destroy(newElem.gameObject);
 					return true;
@@ -248,7 +246,7 @@ public class WorldManager : MonoBehaviour {
 				}
 				break;
 			case ElementType.Soul:
-				switch (newElem.GetElement()) {
+				switch (newElem.GetElementType()) {
 				case ElementType.Stone:
 					CreateSquareOfElement(ElementType.Stone, i, j, 5, false);
 					Destroy(newElem.gameObject);
@@ -319,10 +317,10 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public void SetElementAtGridPos(Element elem, int i, int j) {
-		if (world[i][j] != null)
-			Destroy(world[i][j].gameObject);
+		if (grid.get(i, j) != null)
+			Destroy(grid.get(i, j).gameObject);
 		if (elem.InGrid())
-			world[i][j] = elem;
+			grid.set(i, j, elem);
 
 		elem.PutDown(i, j);
 		elem.transform.position = GridToWorldPos(i, j);
@@ -356,7 +354,7 @@ public class WorldManager : MonoBehaviour {
 					continue;
 
 				Element elem = null;
-				if (world[i][j] == null) {
+				if (grid.get(i, j) == null) {
 					switch (type) {
 					case ElementType.Fire:
 						elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
@@ -412,7 +410,7 @@ public class WorldManager : MonoBehaviour {
 			MoveElementAtGridPos(elem, i, j);
 		}
 
-		return world[i][j];
+		return grid.get(i, j);
 	}
 
 	public bool IsElementClose(ElementType type, int ii, int jj, int r) {
@@ -424,7 +422,7 @@ public class WorldManager : MonoBehaviour {
 				if (!jInMap(j))
 					continue;
 
-				if (world[i][j] != null && world[i][j].GetElement() == type)
+				if (grid.get(i, j) != null && grid.get(i, j).GetElementType() == type)
 					return true;
 			}
 		}
@@ -439,7 +437,7 @@ public class WorldManager : MonoBehaviour {
 			if (iInMap(i)) {
 				for (int j = jj - r; j <= jj + r; j++) {
 					if (jInMap(j)) {
-						nearBys[iii][jjj] = world[i][j];
+						nearBys[iii][jjj] = grid.get(i, j);
 					}
 					jjj++;
 				}
@@ -455,11 +453,11 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public bool iInMap(int i) {
-		return i >= 0 && i < worldW;
+		return i >= 0 && i < grid.w;
 	}
 
 	public bool jInMap(int j) {
-		return j >= 0 && j < worldH;
+		return j >= 0 && j < grid.h;
 	}
 
 	public void Throw(ThrowableObject obj, Transform origin) {
@@ -489,4 +487,23 @@ public class WorldManager : MonoBehaviour {
 	public Transform PlayerTransform() {
 		return player.transform;
 	}
+//
+//	void OnDrawGizmos ()
+//	{
+//		Vector3 pos = transform.position;
+//
+//		float initY = pos.y;
+//		float totalH = -(((grid.h - 1) * blockW) - initY);
+//
+//		float initX = pos.x;
+//		float totalW = initX + ((grid.w - 1) * blockW);
+//
+//		for (float x = initX; x <= totalW + 1; x += blockW) {
+//			Gizmos.DrawLine (new Vector3 (x, 0.0f, initY), new Vector3 (x, 0.0f, totalH));
+//		}
+//		for (float y = initY; y > totalH; y -= blockW) {
+//			Gizmos.DrawLine (new Vector3 (initX, 0.0f, y), new Vector3 (totalW, 0.0f, y));	
+//		}
+//	    	
+//	}
 }

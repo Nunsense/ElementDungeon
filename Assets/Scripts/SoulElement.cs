@@ -9,7 +9,7 @@ public class SoulElement : Element {
 	
 	}
 
-	public override ElementType GetElement () {
+	public override ElementType GetElementType () {
 		return ElementType.Soul;
 	}
 

@@ -12,7 +12,7 @@ public class StoneElement : Element {
 		return true;	
 	}
 
-	public override ElementType GetElement () {
+	public override ElementType GetElementType () {
 		return ElementType.Stone;
 	}
 }

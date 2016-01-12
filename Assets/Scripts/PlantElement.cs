@@ -12,7 +12,7 @@ public class PlantElement : Element {
 		}
 	}
 
-	public override ElementType GetElement () {
+	public override ElementType GetElementType () {
 		return ElementType.Plant;
 	}
 

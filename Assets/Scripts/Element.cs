@@ -68,7 +68,7 @@ public class Element : MonoBehaviour {
 	public virtual void Action(int i, int j) {
 	}
 
-	public virtual ElementType GetElement() {
+	public virtual ElementType GetElementType() {
 		return ElementType.None;
 	}
 

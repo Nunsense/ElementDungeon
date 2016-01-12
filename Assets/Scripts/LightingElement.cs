@@ -65,7 +65,7 @@ public class LightingElement : Element {
 		particles.gameObject.SetActive(visible);
 	}
 
-	public override ElementType GetElement() {
+	public override ElementType GetElementType() {
 		return ElementType.Lighting;
 	}
 

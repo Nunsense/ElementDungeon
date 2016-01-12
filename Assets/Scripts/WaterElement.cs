@@ -20,7 +20,7 @@ public class WaterElement : Element {
 
 				Element elem = near[ii][jj];
 
-				if (elem != null && elem.GetElement() == ElementType.Water) {
+				if (elem != null && elem.GetElementType() == ElementType.Water) {
 					int iii = gridX + (gridX - elem.GetGridX() > 0 ? -1 : 1);
 					int jjj = gridY + (gridY - elem.GetGridY() > 0 ? -1 : 1);
 					world.CreateElementAtGridPos(ElementType.Water, iii, jjj);
@@ -29,7 +29,7 @@ public class WaterElement : Element {
 		}
 	}
 
-	public override ElementType GetElement() {
+	public override ElementType GetElementType() {
 		return ElementType.Water;
 	}
 

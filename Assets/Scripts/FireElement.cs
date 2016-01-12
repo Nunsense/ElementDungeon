@@ -19,14 +19,14 @@ public class FireElement : Element {
 					continue;
 
 				Element elem = near[ii][jj];
-				if (elem != null && elem.GetElement() == ElementType.Plant) {
+				if (elem != null && elem.GetElementType() == ElementType.Plant) {
 					world.CreateElementAtGridPos(ElementType.Fire, elem.GetGridX(), elem.GetGridY());
 				}
 			}	
 		}
 	}
 
-	public override ElementType GetElement() {
+	public override ElementType GetElementType() {
 		return ElementType.Fire;
 	}
 
