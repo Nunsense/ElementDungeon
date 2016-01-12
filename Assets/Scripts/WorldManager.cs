@@ -18,9 +18,11 @@ public class WorldManager : MonoBehaviour {
 	public GameObject stonePrefav;
 	public GameObject plantPrefav;
 	public GameObject soulPrefav;
+	public GameObject icePrefav;
 
 	public GameObject snowBallPrefav;
 
+	public GameObject lightingPrefav;
 	public GameObject enemyPrefav;
 
 	public ParticleSystem mosnterExplosion;
@@ -48,12 +50,15 @@ public class WorldManager : MonoBehaviour {
 							elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
 						} else if (rand < 0.8) {
 							elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
-//						} else {
-//							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+						} else if (rand < 0.9) {
+							elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
+						} else {
+							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
 						}
 					}
 				}
 
+					
 				if (elem != null) {
 					elem.transform.parent = transform;
 					SetElementAtGridPos(elem, i, j);
@@ -150,65 +155,91 @@ public class WorldManager : MonoBehaviour {
 		return MoveElementAtGridPos(elem, x, y);
 	}
 
-	public bool MoveElementAtGridPos(Element elem, int i, int j) {
+	public bool MoveElementAtGridPos(Element newElem, int i, int j) {
 		if (world[i][j] != null) {
-			Element other = world[i][j];
-			switch (other.GetElement()) {
+			Element currentElem = world[i][j];
+			switch (currentElem.GetElement()) {
 			case ElementType.Fire:
-				switch (elem.GetElement()) {
+				switch (newElem.GetElement()) {
 				case ElementType.Water:
-					Destroy(other.gameObject);
-					Destroy(elem.gameObject);
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
 					world[i][j] = null;
 					break;
 				case ElementType.Stone:
-					SetElementAtGridPos(elem, i, j);
+					SetElementAtGridPos(newElem, i, j);
+					break;
+				case ElementType.Ice:
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
+					CreateElementAtGridPos(ElementType.Water, i, j);
 					break;
 				default : 
-					Destroy(elem.gameObject);
+					Destroy(newElem.gameObject);
 					break;
 				}
 				return true;
 			case ElementType.Water:
-				switch (elem.GetElement()) {
+				switch (newElem.GetElement()) {
 				case ElementType.Fire:
-					Destroy(other.gameObject);
-					Destroy(elem.gameObject);
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
 					world[i][j] = null;
 					break;
 				case ElementType.Water:
-					Destroy(elem.gameObject);
+					Destroy(newElem.gameObject);
 					break;
 				case ElementType.Stone:
-					SetElementAtGridPos(elem, i, j);
+					SetElementAtGridPos(newElem, i, j);
 					break;
 				case ElementType.Plant:
-					SetElementAtGridPos(elem, i, j);
+					SetElementAtGridPos(newElem, i, j);
+					break;
+				}
+				return true;
+			case ElementType.Ice:
+				switch (newElem.GetElement()) {
+				case ElementType.Fire:
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
+					CreateElementAtGridPos(ElementType.Water, i, j);
+					break;
+				case ElementType.Water:
+					Destroy(newElem.gameObject);
+					break;
+				case ElementType.Stone:
+					Destroy(currentElem.gameObject);
+					break;
+				case ElementType.Plant:
+					Destroy(newElem.gameObject);
+					break;
+				case ElementType.Ice:
+					Destroy(newElem.gameObject);
 					break;
 				}
 				return true;
 			case ElementType.Plant:
-				switch (elem.GetElement()) {
+				switch (newElem.GetElement()) {
 				case ElementType.Water:
-					Destroy(elem.gameObject);
+					Destroy(newElem.gameObject);
 					return true;
 				case ElementType.Fire:
-					SetElementAtGridPos(elem, i, j);
+					SetElementAtGridPos(newElem, i, j);
 					return true;
 				case ElementType.Stone:
-					SetElementAtGridPos(elem, i, j);
+					SetElementAtGridPos(newElem, i, j);
 					return true;
 				case ElementType.Plant:
 					return false;
 				}
 				break;
 			case ElementType.Stone:
-				switch (elem.GetElement()) {
+				switch (newElem.GetElement()) {
 				case ElementType.Fire:
-					Destroy(elem.gameObject);
+					Destroy(newElem.gameObject);
 					return true;
 				case ElementType.Water:
-					Destroy(elem.gameObject);
+					Destroy(newElem.gameObject);
 					return true;
 				case ElementType.Stone:
 					return false;
@@ -216,52 +247,57 @@ public class WorldManager : MonoBehaviour {
 					return false;
 				}
 				break;
-			case ElementType.Enemy:
-				switch (elem.GetElement()) {
-				case ElementType.Fire:
-					Destroy(elem.gameObject);
-					KillMonster(other.gameObject);
-					return true;
-				case ElementType.Water:
-					Destroy(elem.gameObject);
-					return true;
-				case ElementType.Stone:
-					Destroy(elem.gameObject);
-					KillMonster(other.gameObject);
-					return true;
-				}
-				return false;
 			case ElementType.Soul:
-				switch (elem.GetElement()) {
+				switch (newElem.GetElement()) {
 				case ElementType.Stone:
-					CreateSquareOfElement(ElementType.Stone, i, j, 5);
+					CreateSquareOfElement(ElementType.Stone, i, j, 5, false);
+					Destroy(newElem.gameObject);
 					break;
 				case ElementType.Water:
-					CreateSnowBalls(i, j);
+					Destroy(newElem.gameObject);
+					CreatePoolOfElement(ElementType.Ice, i, j, 3, true);
 					break;
 				}
-				Destroy(other.gameObject);
-				Destroy(elem.gameObject);
+				Destroy(currentElem.gameObject);
 				return true;
 			}
 		}
 
-		SetElementAtGridPos(elem, i, j);
+		SetElementAtGridPos(newElem, i, j);
 		return true;
 	}
 
-	private void CreateSquareOfElement(ElementType type, int i, int j, int r) {
+	private void CreateSquareOfElement(ElementType type, int i, int j, int r, bool filled) {
 		for (int ii = -r; ii <= r; ii++) {
 			for (int jj = -r; jj <= r; jj++) {
-				if (ii != -r && ii != r && jj != -r && jj != r)
+				if (!filled && ii != -r && ii != r && jj != -r && jj != r)
 					continue;
 
 				int jjj = j + jj;
 				int iii = i + ii;
 
-				if (InMap(iii, jjj) && GetElementAtGridPos(iii, jjj) == null) {
+				if (InMap(iii, jjj)) {
 					CreateElementAtGridPos(type, iii, jjj);
 				}
+			}	
+		}
+	}
+
+	private void CreatePoolOfElement(ElementType type, int oi, int oj, int dist, bool noise) {
+		if (dist <= 0)
+			return;
+
+		CreateElementAtGridPos(type, oi, oj);
+
+		for (int ii = oi - 1; ii <= oi + 1; ii++) {
+			if (!iInMap(ii))
+				continue;
+
+			for (int jj = oj - 1; jj <= oj + 1; jj++) {
+				if (!jInMap(jj))
+					continue;
+
+				CreatePoolOfElement(type, ii, jj, dist - (noise ? Random.Range(1, 4) : 1), noise);
 			}	
 		}
 	}
@@ -285,7 +321,9 @@ public class WorldManager : MonoBehaviour {
 	public void SetElementAtGridPos(Element elem, int i, int j) {
 		if (world[i][j] != null)
 			Destroy(world[i][j].gameObject);
-		world[i][j] = elem;
+		if (elem.InGrid())
+			world[i][j] = elem;
+
 		elem.PutDown(i, j);
 		elem.transform.position = GridToWorldPos(i, j);
 	}
@@ -346,12 +384,8 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element CreateElementAtGridPos(ElementType type, int i, int j) {
-		if (world[i][j] != null) {
-			Destroy(world[i][j].gameObject);
-			world[i][j] = null;
-		}
-
 		Element elem = null;
+
 		switch (type) {
 		case ElementType.Fire:
 			elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
@@ -368,12 +402,14 @@ public class WorldManager : MonoBehaviour {
 		case ElementType.Soul:
 			elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
 			break;
+		case ElementType.Ice:
+			elem = (GameObject.Instantiate(icePrefav) as GameObject).GetComponent<Element>();
+			break;
 		}
 					
 
 		if (elem != null) {
-			elem.transform.parent = transform;
-			SetElementAtGridPos(elem, i, j);
+			MoveElementAtGridPos(elem, i, j);
 		}
 
 		return world[i][j];

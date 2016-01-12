@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class Monster : Element {
+	public GameObject lights;
+
 	private bool isWandering;
 	private bool isDead;
 
@@ -62,7 +64,7 @@ public class Monster : Element {
 					if (walkingTime <= blockDistanceWalkTime) {
 						transform.position = Vector3.Lerp(transform.position, walkingTargetPos, walkingTime / blockDistanceWalkTime);
 					} else {
-						world.SetElementAtGridPos(this, walkingTargetGridX, walkingTargetGridY);
+//						world.SetElementAtGridPos(this, walkingTargetGridX, walkingTargetGridY);
 						walkingTime = 0;
 						walkingTargetPos = Vector3.zero;
 						restingTime = Random.Range(0, maxRestTime);
@@ -101,7 +103,6 @@ public class Monster : Element {
 				if (rand < agroChance) {
 					if (world.DistanceToPlayer(transform.position) < agroDistance) {
 						isWandering = false;
-						Debug.Log("AGROOOOOO");
 					}
 				}
 			}
@@ -115,11 +116,15 @@ public class Monster : Element {
 		}
 	}
 
-	public override bool CanPickUp() {
+	public override ElementType GetElement() {
+		return ElementType.Enemy;
+	}
+
+	public override bool InGrid() {
 		return false;
 	}
 
-	public override ElementType GetElement() {
-		return ElementType.Enemy;
+	public override void SetVisible(bool visible) {
+		lights.SetActive(visible);
 	}
 }

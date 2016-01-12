@@ -8,7 +8,9 @@ public enum ElementType {
 	Plant,
 	None,
 	Enemy,
-	Soul
+	Soul,
+	Ice,
+	Lighting
 }
 
 public class Element : MonoBehaviour {
@@ -75,5 +77,9 @@ public class Element : MonoBehaviour {
 	}
 
 	public virtual void SetVisible(bool visible) {
+	}
+
+	public virtual bool InGrid() {
+		return true;
 	}
 }
