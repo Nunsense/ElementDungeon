@@ -7,6 +7,7 @@ public class LightingElement : Element {
 	private bool falling;
 	private Vector3 upPosition;
 	private Vector3 downPosition;
+	private BoxCollider collider;
 
 	[SerializeField] private float cooldownMax = 2f;
 	[SerializeField] private float cooldownMin = 5f;
@@ -21,9 +22,11 @@ public class LightingElement : Element {
 	public Transform ray;
 
 	void Start() {
+		collider = GetComponent<BoxCollider> ();
 		cameraShake = Camera.main.GetComponent<CameraShake>();
 		lights.enabled = false;
 		falling = false;
+		collider.enabled = false;
 		downPosition = ray.position;
 		upPosition = ray.position;
 		upPosition.y = 10;
@@ -44,6 +47,7 @@ public class LightingElement : Element {
 				ray.position = upPosition;
 				ray.gameObject.SetActive(false);
 				falling = false;
+				collider.enabled = false;
 				timeTillNext = Random.Range(cooldownMin, cooldownMax);
 			}
 
@@ -57,6 +61,7 @@ public class LightingElement : Element {
 			cameraShake.Action(1 - (world.DistanceToPlayer(transform.position) * 0.06f));
 			lights.enabled = true;
 			ray.gameObject.SetActive(true);
+			collider.enabled = true;
 		}
 	}
 
@@ -71,5 +76,14 @@ public class LightingElement : Element {
 
 	public override bool InGrid() {
 		return false;
+	}
+
+	void OnTriggerEnter(Collider col) {
+		Debug.Log(col.name);
+		if (col.tag == "Monster") {
+			world.HitMonster(col.gameObject);
+		} else if (col.tag == "Plant") {
+			world.CreateElementAtGridPos(ElementType.Fire, gridX, gridY);
+		}
 	}
 }

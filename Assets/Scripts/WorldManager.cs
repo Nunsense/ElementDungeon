@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class WorldManager : MonoBehaviour {
+	public bool debug;
+
 	public float blockW;
 
 	[SerializeField] private float tickTime = 1f;
@@ -36,22 +38,37 @@ public class WorldManager : MonoBehaviour {
 				if (i == 0 || i == grid.w - 1 || j == 0 || j == grid.h - 1) {
 					elem = (GameObject.Instantiate(wallPrefav) as GameObject).GetComponent<Element>();
 				} else {
-					if (Random.value < 0.01) {
-						float rand = Random.value;
-						if (rand < 0.1) {
-							elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
-						} else if (rand < 0.4) {
-							elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
-						} else if (rand < 0.5) {
-							elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
-						} else if (rand < 0.7) {
-							elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
-						} else if (rand < 0.8) {
-							elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
-						} else if (rand < 0.9) {
-							elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
-						} else {
-							elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+					if (debug) {
+						if (Random.value < 0.01) {
+							float rand = Random.value;
+							if (rand < 0.1) {
+								elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.4) {
+								elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.5) {
+								elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.7) {
+								elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.8) {
+								elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.9) {
+								elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
+							} else {
+								elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+							}
+						}
+					} else {
+						if (Random.value < 0.01) {
+							float rand = Random.value;
+							if (rand < 0.1) {
+								elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.4) {
+								elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.6) {
+								elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.8) {
+								elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
+							}
 						}
 					}
 				}
@@ -62,6 +79,11 @@ public class WorldManager : MonoBehaviour {
 					SetElementAtGridPos(elem, i, j);
 				}
 			}
+		}
+
+		if (!debug) {
+			Element lighting = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
+			SetElementAtGridPos(lighting, 50, 60);
 		}
 	}
 

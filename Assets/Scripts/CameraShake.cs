@@ -36,7 +36,6 @@ public class CameraShake : MonoBehaviour {
 	}
 
 	public void Action(float amount) {
-	Debug.Log(amount);
 		if (amount < 0.1f)
 			return;
 
