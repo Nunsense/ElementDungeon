@@ -39,7 +39,7 @@ public class WorldManager : MonoBehaviour {
 					elem = (GameObject.Instantiate(wallPrefav) as GameObject).GetComponent<Element>();
 				} else {
 					if (debug) {
-						if (Random.value < 0.01) {
+						if (Random.value < 0.05) {
 							float rand = Random.value;
 							if (rand < 0.1) {
 								elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
@@ -60,13 +60,13 @@ public class WorldManager : MonoBehaviour {
 					} else {
 						if (Random.value < 0.01) {
 							float rand = Random.value;
-							if (rand < 0.1) {
+							if (rand < 0.2) {
 								elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.4) {
+							} else if (rand < 0.5) {
 								elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.6) {
-								elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
 							} else if (rand < 0.8) {
+								elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.9) {
 								elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
 							}
 						}

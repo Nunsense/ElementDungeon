@@ -79,7 +79,6 @@ public class LightingElement : Element {
 	}
 
 	void OnTriggerEnter(Collider col) {
-		Debug.Log(col.name);
 		if (col.tag == "Monster") {
 			world.HitMonster(col.gameObject);
 		} else if (col.tag == "Plant") {

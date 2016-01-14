@@ -16,9 +16,9 @@ public class CameraSmoothFollow : MonoBehaviour {
 
 	void Update () {
 		transform.position = Vector3.Lerp (transform.position, target.position - posOffset, Time.deltaTime * followFactor);
-		Quaternion rotTo = Quaternion.LookRotation (target.position - transform.position);
-		rotTo.y = 0;
-		rotTo.z = 0;
-		transform.rotation = Quaternion.Lerp (transform.rotation, rotTo, Time.deltaTime * rotationFactor);
+//		Quaternion rotTo = Quaternion.LookRotation (target.position);
+//		rotTo.y = 0;
+//		rotTo.z = 0;
+//		transform.rotation = Quaternion.Lerp (transform.rotation, rotTo, Time.deltaTime * rotationFactor);
 	}
 }

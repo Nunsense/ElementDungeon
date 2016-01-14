@@ -21,8 +21,10 @@ public class Monster : Element {
 	private Element pickedUpObject;
 
 	public float blockDistanceWalkTime = 0.2f;
-	[SerializeField][Range(0, 1)] private float agroChance; 
-	[SerializeField] private float agroDistance; 
+	[SerializeField][Range(0, 1)] private float agroChance;
+	[SerializeField] private float agroDistance;
+
+	public MonsterVision vision;
 
 	void Start() {
 		isDead = false;
@@ -42,6 +44,10 @@ public class Monster : Element {
 		}
 	}
 
+	public void ElementIsNear(Element elem) {
+		
+	}
+
 	protected override void UpdateElement() {
 		if (isDead) {
 			dieingTime -= Time.deltaTime;
@@ -52,13 +58,18 @@ public class Monster : Element {
 			return;
 		}
 
-		if (restingTime > 0) {
-			restingTime -= Time.deltaTime;
-			return;
-		}
-
 		if (isWandering) {
+			if (restingTime > 0) {
+				restingTime -= Time.deltaTime;
+				return;
+			}
+
 			if (walkingTargetPos != Vector3.zero) {
+				if (vision) {
+					for (int i = 0; i < vision.nearByLetal.Count; i++) {
+						walkingTargetPos += (transform.position - vision.nearByLetal[i].gameObject.transform.position) * 0.1f;
+					}
+				}
 				if (world.GetElementAtGridPos(walkingTargetGridX, walkingTargetGridY) == null) {
 					walkingTime += Time.deltaTime;
 					if (walkingTime <= blockDistanceWalkTime) {
@@ -103,14 +114,24 @@ public class Monster : Element {
 				if (rand < agroChance) {
 					if (world.DistanceToPlayer(transform.position) < agroDistance) {
 						isWandering = false;
+						restingTime = 0;
 					}
 				}
 			}
 		} else {
-			if (world.DistanceToPlayer(transform.position) > 20) {
-				isWandering = true;
-				Debug.Log("I totally forgot why I was running like a 1D fan at a concert");
+			restingTime += Time.deltaTime;
+			if (restingTime > 0.5f) {
+				Debug.Log(world.DistanceToPlayer(transform.position));
+				if (world.DistanceToPlayer(transform.position) > 5.8f) {
+					isWandering = true;
+					walkingTargetPos = Vector3.zero;
+					RotateRandom();
+					restingTime = Random.Range(0, maxRestTime);
+					return;
+				}
+				restingTime = 0;
 			}
+			 
 			transform.LookAt(world.PlayerTransform().position);
 			transform.position = Vector3.Lerp(transform.position, world.PlayerTransform().position, Time.deltaTime);
 		}
