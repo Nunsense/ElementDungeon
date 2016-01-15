@@ -10,7 +10,8 @@ public enum ElementType {
 	Enemy,
 	Soul,
 	Ice,
-	Lighting
+	Lighting,
+	Life
 }
 
 public class Element : MonoBehaviour {
@@ -24,12 +25,15 @@ public class Element : MonoBehaviour {
 
 	protected Renderer ren;
 
+	public bool canReact;
+
 	static int[] rotations = new int[] { 0, 90, 180, 270 };
 
 	void Awake() {
 		world = GameObject.Find("World").GetComponent<WorldManager>();
 		ren = GetComponentInChildren<Renderer>();
 		RotateRandom();
+		canReact = true;
 	}
 
 	void Update() {
@@ -48,6 +52,7 @@ public class Element : MonoBehaviour {
 		gridX = i;
 		gridY = j;
 		pickUpOrigin = null;
+		canReact = false;
 	}
 
 	public int GetGridX() {
@@ -58,6 +63,13 @@ public class Element : MonoBehaviour {
 		return gridY;
 	}
 
+	public void Action(int i, int j) {
+		if (canReact)
+			ActionElement(i, j);
+		else
+			canReact = true;
+	}
+
 	protected void RotateRandom() {
 		transform.eulerAngles = new Vector3(0, rotations[Random.Range(0, rotations.Length)], 0);
 	}
@@ -65,7 +77,7 @@ public class Element : MonoBehaviour {
 	protected virtual void UpdateElement() {
 	}
 
-	public virtual void Action(int i, int j) {
+	protected virtual void ActionElement(int i, int j) {
 	}
 
 	public virtual ElementType GetElementType() {

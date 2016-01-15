@@ -6,9 +6,6 @@ public class IceElement : Element {
 	void Start() {
 	}
 
-	public override void Action(int i, int j) {
-	}
-
 	public override ElementType GetElementType() {
 		return ElementType.Ice;
 	}

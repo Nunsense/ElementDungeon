@@ -48,13 +48,13 @@ public class LevelMapEditor : Editor {
 			for (int i = 0; i < tempGridW && i < map.grid.w; i++) {
 				tempGrid[i] = new Element[tempGridH];
 				for (int j = 0; j < tempGridH && j < map.grid.h; j++) {
-					tempGrid[i][j] = map.grid.get(i, j);
+					tempGrid[i][j] = map.grid.Get(i, j);
 				}
 			}
 
 			for (int i = 0; i < map.grid.w; i++) {
 				for (int j = 0; j < map.grid.h; j++) {
-					map.grid.set(i, j, null);
+					map.grid.Set(i, j, null);
 				}
 			}
 			map.grid.elements = tempGrid;
@@ -67,10 +67,10 @@ public class LevelMapEditor : Editor {
 		if (GUILayout.Button("Clear")) {
 			for (int i = 0; i < map.grid.w; i++) {
 				for (int j = 0; j < map.grid.h; j++) {
-					if (map.grid.get(i, j)) {
-						GameObject.DestroyImmediate(map.grid.get(i, j).gameObject);
+					if (map.grid.Get(i, j)) {
+						GameObject.DestroyImmediate(map.grid.Get(i, j).gameObject);
 					}
-					map.grid.set(i, j, null);
+					map.grid.Set(i, j, null);
 				}
 			}
 			map.grid.elements = new Element[map.grid.w][];
