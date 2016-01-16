@@ -8,7 +8,7 @@ public class FireElement : Element {
 	void Start() {
 	}
 
-	public override void Action(int i, int j) {
+	protected override void ActionElement(int i, int j) {
 		Element[][] near = world.GetElementsNearBy(i, j, 1);
 		for (int ii = 0; ii < near.Length; ii++) {
 			if (near[ii] == null)

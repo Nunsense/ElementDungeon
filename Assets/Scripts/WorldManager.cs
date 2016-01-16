@@ -18,7 +18,9 @@ public class WorldManager : MonoBehaviour {
 	public GameObject stonePrefav;
 	public GameObject plantPrefav;
 	public GameObject soulPrefav;
+
 	public GameObject icePrefav;
+	public GameObject lifePrefav;
 
 	public GameObject snowBallPrefav;
 
@@ -39,22 +41,27 @@ public class WorldManager : MonoBehaviour {
 					elem = (GameObject.Instantiate(wallPrefav) as GameObject).GetComponent<Element>();
 				} else {
 					if (debug) {
-						if (Random.value < 0.05) {
+						if (Random.value < 0.02) {
 							float rand = Random.value;
-							if (rand < 0.1) {
-								elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.4) {
-								elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.5) {
+//							if (rand < 0.01) {
+//								elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
+//							} else if (rand < 0.1) {
+//								elem = (GameObject.Instantiate(stonePrefav) as GameObject).GetComponent<Element>();
+//							} else if (rand < 0.2) {
+//								elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+//							} else
+							 if (rand < 0.3) {
 								elem = (GameObject.Instantiate(waterPrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.7) {
+							} else if (rand < 0.4) {
 								elem = (GameObject.Instantiate(plantPrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.8) {
-								elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
-							} else if (rand < 0.9) {
-								elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
-							} else {
-								elem = (GameObject.Instantiate(soulPrefav) as GameObject).GetComponent<Element>();
+//							} else if (rand < 0.5) {
+//								elem = (GameObject.Instantiate(enemyPrefav) as GameObject).GetComponent<Element>();
+							} else if (rand < 0.7) {
+								elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
+//							} else if (rand < 0.8) {
+//								elem = (GameObject.Instantiate(lifePrefav) as GameObject).GetComponent<Element>();
+//							} else if (rand < 0.9) {
+//								elem = (GameObject.Instantiate(lightingPrefav) as GameObject).GetComponent<Element>();
 							}
 						}
 					} else {
@@ -102,7 +109,7 @@ public class WorldManager : MonoBehaviour {
 		Element elem;
 		for (int i = 0; i < grid.w; i++) {
 			for (int j = 0; j < grid.h; j++) {
-				elem = grid.get(i, j);
+				elem = grid.Get(i, j);
 				if (elem != null) {
 					elem.SetVisible(i >= minX && i <= maxX && j >= minY && j <= maxY);
 				}
@@ -115,7 +122,7 @@ public class WorldManager : MonoBehaviour {
 
 		for (int i = 0; i < grid.w; i++) {
 			for (int j = 0; j < grid.h; j++) {
-				elem = grid.get(i, j);
+				elem = grid.Get(i, j);
 				if (elem != null) {
 					elem.Action(i, j);
 				}
@@ -145,8 +152,8 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element PickUpElementAtGridPos(int i, int j) {
-		Element elem = grid.get(i, j);
-		grid.set(i, j, null);
+		Element elem = grid.Get(i, j);
+		grid.Set(i, j, null);
 
 		return elem;
 	}
@@ -159,7 +166,7 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element GetElementAtGridPos(int i, int j) {
-		return grid.get(i, j);
+		return grid.InGrid(i, j) ? grid.Get(i, j) : null;
 	}
 
 	public Element GetElementAtWorldPos(Vector3 pos) {
@@ -176,15 +183,18 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public bool MoveElementAtGridPos(Element newElem, int i, int j) {
-		if (grid.get(i, j) != null) {
-			Element currentElem = grid.get(i, j);
+		if (!grid.InGrid(i, j))
+			return false;
+
+		if (grid.Get(i, j) != null) {
+			Element currentElem = grid.Get(i, j);
 			switch (currentElem.GetElementType()) {
 			case ElementType.Fire:
 				switch (newElem.GetElementType()) {
 				case ElementType.Water:
 					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
-					grid.set(i, j, null);
+					grid.Set(i, j, null);
 					break;
 				case ElementType.Stone:
 					SetElementAtGridPos(newElem, i, j);
@@ -204,7 +214,7 @@ public class WorldManager : MonoBehaviour {
 				case ElementType.Fire:
 					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
-					grid.set(i, j, null);
+					grid.Set(i, j, null);
 					break;
 				case ElementType.Water:
 					Destroy(newElem.gameObject);
@@ -214,6 +224,11 @@ public class WorldManager : MonoBehaviour {
 					break;
 				case ElementType.Plant:
 					SetElementAtGridPos(newElem, i, j);
+					break;
+				case ElementType.Soul:
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
+					CreatePoolOfElement(ElementType.Ice, i, j, 3, true);
 					break;
 				}
 				return true;
@@ -251,6 +266,11 @@ public class WorldManager : MonoBehaviour {
 					return true;
 				case ElementType.Plant:
 					return false;
+				case ElementType.Soul:
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
+					CreateElementAtGridPos(ElementType.Life, i, j);
+					return true;
 				}
 				break;
 			case ElementType.Stone:
@@ -274,8 +294,14 @@ public class WorldManager : MonoBehaviour {
 					Destroy(newElem.gameObject);
 					break;
 				case ElementType.Water:
+					Destroy(currentElem.gameObject);
 					Destroy(newElem.gameObject);
 					CreatePoolOfElement(ElementType.Ice, i, j, 3, true);
+					break;
+				case ElementType.Plant:
+					Destroy(currentElem.gameObject);
+					Destroy(newElem.gameObject);
+					CreateElementAtGridPos(ElementType.Life, i, j);
 					break;
 				}
 				Destroy(currentElem.gameObject);
@@ -296,7 +322,7 @@ public class WorldManager : MonoBehaviour {
 				int jjj = j + jj;
 				int iii = i + ii;
 
-				if (InMap(iii, jjj)) {
+				if (grid.InGrid(iii, jjj)) {
 					CreateElementAtGridPos(type, iii, jjj);
 				}
 			}	
@@ -310,11 +336,11 @@ public class WorldManager : MonoBehaviour {
 		CreateElementAtGridPos(type, oi, oj);
 
 		for (int ii = oi - 1; ii <= oi + 1; ii++) {
-			if (!iInMap(ii))
+			if (!grid.iInGrid(ii))
 				continue;
 
 			for (int jj = oj - 1; jj <= oj + 1; jj++) {
-				if (!jInMap(jj))
+				if (!grid.jInGrid(jj))
 					continue;
 
 				CreatePoolOfElement(type, ii, jj, dist - (noise ? Random.Range(1, 4) : 1), noise);
@@ -339,10 +365,10 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public void SetElementAtGridPos(Element elem, int i, int j) {
-		if (grid.get(i, j) != null)
-			Destroy(grid.get(i, j).gameObject);
+		if (grid.Get(i, j) != null)
+			Destroy(grid.Get(i, j).gameObject);
 		if (elem.InGrid())
-			grid.set(i, j, elem);
+			grid.Set(i, j, elem);
 
 		elem.PutDown(i, j);
 		elem.transform.position = GridToWorldPos(i, j);
@@ -368,15 +394,15 @@ public class WorldManager : MonoBehaviour {
 
 	public bool CreateElementArround(ElementType type, int ii, int jj) {
 		for (int i = ii - 1; i <= ii + 1; i++) {
-			if (!iInMap(i))
+			if (!grid.iInGrid(i))
 				continue;
 
 			for (int j = jj - 1; j <= jj + 1; j++) {
-				if (!jInMap(j))
+				if (!grid.jInGrid(j))
 					continue;
 
 				Element elem = null;
-				if (grid.get(i, j) == null) {
+				if (grid.Get(i, j) == null) {
 					switch (type) {
 					case ElementType.Fire:
 						elem = (GameObject.Instantiate(firePrefav) as GameObject).GetComponent<Element>();
@@ -404,6 +430,9 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public Element CreateElementAtGridPos(ElementType type, int i, int j) {
+		if (!grid.InGrid(i, j))
+			return null;
+
 		Element elem = null;
 
 		switch (type) {
@@ -425,6 +454,9 @@ public class WorldManager : MonoBehaviour {
 		case ElementType.Ice:
 			elem = (GameObject.Instantiate(icePrefav) as GameObject).GetComponent<Element>();
 			break;
+		case ElementType.Life:
+			elem = (GameObject.Instantiate(lifePrefav) as GameObject).GetComponent<Element>();
+			break;
 		}
 					
 
@@ -432,19 +464,19 @@ public class WorldManager : MonoBehaviour {
 			MoveElementAtGridPos(elem, i, j);
 		}
 
-		return grid.get(i, j);
+		return grid.Get(i, j);
 	}
 
 	public bool IsElementClose(ElementType type, int ii, int jj, int r) {
 		for (int i = ii - r; i < ii + r; i++) {
-			if (!iInMap(i))
+			if (!grid.iInGrid(i))
 				continue;
 
 			for (int j = jj - r; j < jj + r; j++) {
-				if (!jInMap(j))
+				if (!grid.jInGrid(j))
 					continue;
 
-				if (grid.get(i, j) != null && grid.get(i, j).GetElementType() == type)
+				if (grid.Get(i, j) != null && grid.Get(i, j).GetElementType() == type)
 					return true;
 			}
 		}
@@ -456,10 +488,10 @@ public class WorldManager : MonoBehaviour {
 		Element[][] nearBys = new Element[(r * 2) + 1] [];
 		for (int i = ii - r; i <= ii + r; i++) {
 			nearBys[iii] = new Element[(r * 2) + 1];
-			if (iInMap(i)) {
+			if (grid.iInGrid(i)) {
 				for (int j = jj - r; j <= jj + r; j++) {
-					if (jInMap(j)) {
-						nearBys[iii][jjj] = grid.get(i, j);
+					if (grid.jInGrid(j)) {
+						nearBys[iii][jjj] = grid.Get(i, j);
 					}
 					jjj++;
 				}
@@ -468,18 +500,6 @@ public class WorldManager : MonoBehaviour {
 			iii++;
 		}
 		return nearBys;
-	}
-
-	public bool InMap(int i, int j) {
-		return jInMap(i) && jInMap(j);
-	}
-
-	public bool iInMap(int i) {
-		return i >= 0 && i < grid.w;
-	}
-
-	public bool jInMap(int j) {
-		return j >= 0 && j < grid.h;
 	}
 
 	public void Throw(ThrowableObject obj, Transform origin) {
@@ -509,23 +529,23 @@ public class WorldManager : MonoBehaviour {
 	public Transform PlayerTransform() {
 		return player.transform;
 	}
-//
-//	void OnDrawGizmos ()
-//	{
-//		Vector3 pos = transform.position;
-//
-//		float initY = pos.y;
-//		float totalH = -(((grid.h - 1) * blockW) - initY);
-//
-//		float initX = pos.x;
-//		float totalW = initX + ((grid.w - 1) * blockW);
-//
-//		for (float x = initX; x <= totalW + 1; x += blockW) {
-//			Gizmos.DrawLine (new Vector3 (x, 0.0f, initY), new Vector3 (x, 0.0f, totalH));
-//		}
-//		for (float y = initY; y > totalH; y -= blockW) {
-//			Gizmos.DrawLine (new Vector3 (initX, 0.0f, y), new Vector3 (totalW, 0.0f, y));	
-//		}
-//	    	
-//	}
+	//
+	//	void OnDrawGizmos ()
+	//	{
+	//		Vector3 pos = transform.position;
+	//
+	//		float initY = pos.y;
+	//		float totalH = -(((grid.h - 1) * blockW) - initY);
+	//
+	//		float initX = pos.x;
+	//		float totalW = initX + ((grid.w - 1) * blockW);
+	//
+	//		for (float x = initX; x <= totalW + 1; x += blockW) {
+	//			Gizmos.DrawLine (new Vector3 (x, 0.0f, initY), new Vector3 (x, 0.0f, totalH));
+	//		}
+	//		for (float y = initY; y > totalH; y -= blockW) {
+	//			Gizmos.DrawLine (new Vector3 (initX, 0.0f, y), new Vector3 (totalW, 0.0f, y));
+	//		}
+	//
+	//	}
 }

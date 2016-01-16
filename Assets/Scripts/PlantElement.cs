@@ -6,7 +6,7 @@ public class PlantElement : Element {
 	
 	}
 
-	public override void Action (int i, int j) {
+	protected override void ActionElement (int i, int j) {
 		if (world.IsElementClose (ElementType.Water, i, j, 2)) {
 			world.CreateElementArround (ElementType.Plant, i, j);
 		}

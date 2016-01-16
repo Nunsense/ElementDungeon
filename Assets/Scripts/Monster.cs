@@ -65,11 +65,12 @@ public class Monster : Element {
 			}
 
 			if (walkingTargetPos != Vector3.zero) {
-				if (vision) {
-					for (int i = 0; i < vision.nearByLetal.Count; i++) {
-						walkingTargetPos += (transform.position - vision.nearByLetal[i].gameObject.transform.position) * 0.1f;
-					}
-				}
+//				if (vision) {
+//					for (int i = 0; i < vision.nearByLetal.Count; i++) {
+//						Debug.Log((transform.position - vision.nearByLetal[i].gameObject.transform.position) * Time.deltaTime * 0.001f);
+//						walkingTargetPos += (transform.position - vision.nearByLetal[i].gameObject.transform.position) * Time.deltaTime * 0.001f;
+//					}
+//				}
 				if (world.GetElementAtGridPos(walkingTargetGridX, walkingTargetGridY) == null) {
 					walkingTime += Time.deltaTime;
 					if (walkingTime <= blockDistanceWalkTime) {
@@ -121,7 +122,6 @@ public class Monster : Element {
 		} else {
 			restingTime += Time.deltaTime;
 			if (restingTime > 0.5f) {
-				Debug.Log(world.DistanceToPlayer(transform.position));
 				if (world.DistanceToPlayer(transform.position) > 5.8f) {
 					isWandering = true;
 					walkingTargetPos = Vector3.zero;
